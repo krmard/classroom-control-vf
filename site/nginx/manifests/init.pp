@@ -1,4 +1,6 @@
-class nginx {
+class nginx (
+  $docroot = '/var/www',
+) {
   File {
     owner => 'root',
     group => 'root',
@@ -7,7 +9,7 @@ class nginx {
   package { 'nginx':
     ensure  => present,
   }
-  file { [ '/etc/nginx/conf.d', '/var/www/' ]:
+  file { [ '/etc/nginx/conf.d', "$docroot" ]:
     ensure  => directory,
   }
   file { '/etc/nginx/nginx.conf':
@@ -22,7 +24,7 @@ class nginx {
     require => Package['nginx'],
     notify  => Service['nginx'],
   }
-  file { '/var/www/index.html':
+  file { "${docroot}/index.html":
     ensure  => file,
     source  => 'puppet:///modules/nginx/index.html',
   }
