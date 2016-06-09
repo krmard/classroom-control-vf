@@ -52,7 +52,7 @@ node default {
   
   if $::virtual != 'physical' {
     $vmtype = capitalize($::virtual)
-    notify { "This is a ${vmname} virtual machine.": }
+    notify { "This is a ${vmtype} virtual machine.": }
   }
   # exec { "Generate motd":
   #  command => "cowsay 'Welcome to ${::fqdn}!' > /etc/motd",
