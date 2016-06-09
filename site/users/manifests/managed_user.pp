@@ -1,10 +1,27 @@
-define users::managed_user ( $group = $title, ){
-  user { $title:
-    ensure  => present,
+# Define: users::managed_user
+#
+define users::managed_user (
+  $user  = $title,
+  $group = $title,
+  $shell = '/bin/bash',
+  $home  = "/home/${title}",
+) {
+  if ! defined(Group[$group]) {
+    group { $group:
+      ensure => present,
+    }
   }
-  file { "/home/${title}":
-    ensure  => directory,
-    owner   => $title,
-    group   => $group,
+  user { $user:
+    ensure     => present,
+    gid        => $group,
+    home       => $home,
+    shell      => $shell,
+    managehome => true,
+  }
+  file { "${home}/.ssh":
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => '0750',
   }
 }
