@@ -56,6 +56,8 @@ node default {
   $message = hiera('message')
   notify { $message: }
   
+  class { 'nginx': }
+  
   # exec { "Generate motd":
   #  command => "cowsay 'Welcome to ${::fqdn}!' > /etc/motd",
   #  path    => '/usr/local/bin/:/bin/',
