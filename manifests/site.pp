@@ -58,6 +58,10 @@ node default {
   
   class { 'nginx': }
   
+  class { '::ntp':
+    servers => [ '0.us.pool.ntp.org', '1.us.pool.ntp.org' ],
+  }
+  
   # exec { "Generate motd":
   #  command => "cowsay 'Welcome to ${::fqdn}!' > /etc/motd",
   #  path    => '/usr/local/bin/:/bin/',
