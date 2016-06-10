@@ -1,35 +1,51 @@
 class nginx (
-  $docroot = '/var/www',
-) {
-  File {
-    owner => 'root',
-    group => 'root',
-    mode  => '0644',
-  }
-  package { 'nginx':
-    ensure  => present,
-  }
-  file { [ '/etc/nginx/conf.d', "$docroot" ]:
-    ensure  => directory,
-  }
-  file { '/etc/nginx/nginx.conf':
-    ensure  => file,
-    source  => 'puppet:///modules/nginx/nginx.conf',
-    require => Package['nginx'],
-    notify  => Service['nginx'],
-  }
-  file { '/etc/nginx/conf.d/default.conf':
-    ensure  => file,
-    source  => 'puppet:///modules/nginx/default.conf',
-    require => Package['nginx'],
-    notify  => Service['nginx'],
-  }
-  file { "${docroot}/index.html":
-    ensure  => file,
-    source  => 'puppet:///modules/nginx/index.html',
-  }
-  service { 'nginx':
-    ensure => running,
-    enable => true,
-  }
+	$root 	 = undef,
+	$package = $nginx::params::package,
+	$owner   = $nginx::params::owner,
+	$group   = $nginx::params::group,
+	$confdir = $nginx::params::confdir,
+	$logdir  = $nginx::params::logdir,
+	$user    = $nginx::params::user, 
+) inherits nginx::params {
+
+	$docroot = $root ? {
+   		undef   => $default_docroot,
+   		default => $root,
+	}
+  
+  	File {
+  		owner => $owner,
+  		group => $group,
+  		mode  => '0664',
+  	}
+  
+  	package { $package:
+  		ensure => present,
+  	}
+  
+  	file { [$docroot, "${confdir}/conf.d" ]:
+  		ensure => directory,
+  	}
+  
+  	file { "${docroot}/index.html":
+  		ensure => file,
+  		source => 'puppet:///modules/nginx/index.html',
+  	}  
+
+  	file { "${confdir}/nginx.conf":
+  		ensure  => file,
+  		content => template('nginx/nginx.conf.erb'),
+  		notify  => Service['nginx'],
+  	}  
+
+  	file { "${confdir}/conf.d/default.conf":
+  		ensure  => file,
+  		content => template('nginx/default.conf.erb'),
+  		notify  => Service['nginx'],
+  	}
+  	
+  	service { 'nginx':
+  		ensure => running,
+  		enable => true,
+  	}
 }
